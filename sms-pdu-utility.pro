@@ -15,3 +15,7 @@ include(deployment.pri)
 
 HEADERS += \
     pdu.h
+
+RC_FILE = sms-pdu-utility.rc
+
+
