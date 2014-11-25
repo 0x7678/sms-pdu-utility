@@ -6,16 +6,10 @@ class Pdu : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString typeOfAddr READ typeOfAddr)
-    Q_PROPERTY(QString addrValue MEMBER  m_addrValue)
-    Q_PROPERTY(int typeOfNum READ typeOfNum WRITE setTypeOfNum)
-    Q_PROPERTY(int numPlanId READ numPlanId WRITE setNumPlanId)
 
-    Q_PROPERTY(int daTypeOfNum READ daTypeOfNum WRITE setDaTypeOfNum)
-    Q_PROPERTY(int daNumPlanId READ daNumPlanId WRITE setDaNumPlanId)
-
-    Q_PROPERTY(QString destAddr MEMBER  m_destAddr)
-    Q_PROPERTY(QString userData MEMBER  m_userData)
+    Q_PROPERTY(QString addrValue MEMBER  m_addrValue NOTIFY addrValueChange)
+    Q_PROPERTY(QString destAddr MEMBER  m_destAddr NOTIFY destAddrChange)
+    Q_PROPERTY(QString userData MEMBER  m_userData NOTIFY userDataChange)
 
 
 
@@ -23,59 +17,40 @@ public:
     Pdu(QObject *parent = 0);
     ~Pdu();
 
-    QString typeOfAddr()const { return QString("%1").arg(m_typeOfAddrVal, 0, 16); }
 
-    int typeOfNum()const { return m_typeOfNumField;}
-    void setTypeOfNum(int val)
-    {
-        m_typeOfNumField = val;
-        updateTypeOfAddr();
-    }
-
-    int numPlanId()const { return m_numPlanIdField;}
-    void setNumPlanId(int val)
-    {
-        m_numPlanIdField = val;
-        updateTypeOfAddr();
-    }
-
-    int daTypeOfNum()const { return m_daTypeOfNumField;}
-    void setDaTypeOfNum(int val)
-    {
-        m_daTypeOfNumField = val;
-        updateDaTypeOfAddr();
-    }
-
-    int daNumPlanId()const { return m_daNumPlanIdField;}
-    void setDaNumPlanId(int val)
-    {
-        m_daNumPlanIdField = val;
-        updateDaTypeOfAddr();
-    }
 
     Q_INVOKABLE QString generate();
+    Q_INVOKABLE void analyze();
 
 signals:
-    void typeOfNumChange(void);
+
+    void addrValueChange(void);
+    void userDataChange(void);
+    void destAddrChange(void);
+
+public:
+    QObject *resultTextArea;
 
 private:
+    enum {
+        SMS_DELIVER = 0,
+        SMS_SUBMIT,
+    };
 
-    void updateTypeOfAddr() { m_typeOfAddrVal = (8+m_typeOfNumField)*16 + m_numPlanIdField; }
-    void updateDaTypeOfAddr() { m_daTypeOfAddrVal = (8+m_daTypeOfNumField)*16 + m_daNumPlanIdField; }
+
+
     QString semiOctetRepresentation(const QString &src);
+    QString analyzeSemiOctet(const QString &src);
+
+    QString analyzeAlphanumeric(QString &src);
 
 
-    int m_typeOfAddrVal;
-    int m_typeOfNumField;
-    int m_numPlanIdField;
-
-    int m_daTypeOfAddrVal;
-    int m_daTypeOfNumField;
-    int m_daNumPlanIdField;
 
     QString m_addrValue;
     QString m_destAddr;
     QString m_userData;
+
+
 };
 
 #endif // PDU_H
